@@ -1,0 +1,6 @@
+@SparkleTicketing.Api_HostAddress = http://localhost:5001
+
+GET {{SparkleTicketing.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

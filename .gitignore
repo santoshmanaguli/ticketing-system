@@ -1,0 +1,14 @@
+bin/
+obj/
+.vs/
+.vscode/
+node_modules/
+.tools/
+dist/
+*.log
+*.tsbuildinfo
+.env
+*.user
+*.suo
+*.db
+*.sqlite
