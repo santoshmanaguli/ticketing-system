@@ -24,6 +24,7 @@ public sealed class SparkleTicketingDbContext(DbContextOptions<SparkleTicketingD
             entity.HasIndex(user => user.Email).IsUnique();
             entity.Property(user => user.FullName).HasMaxLength(120).IsRequired();
             entity.Property(user => user.Email).HasMaxLength(160).IsRequired();
+            entity.Property(user => user.PasswordHash).HasMaxLength(500).IsRequired();
             entity.Property(user => user.Role).HasConversion<string>().HasMaxLength(40).IsRequired();
         });
 

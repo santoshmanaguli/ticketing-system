@@ -129,6 +129,25 @@ To manually apply migrations:
 dotnet tool run dotnet-ef database update --project backend\SparkleTicketing.Api\SparkleTicketing.Api.csproj --startup-project backend\SparkleTicketing.Api\SparkleTicketing.Api.csproj
 ```
 
+## Auth
+
+Seed users (password for all: `Sparkle@123`):
+
+```txt
+aarav@sparkleerp.local   SupportManager
+nisha@sparkleerp.local   SupportAgent
+rohan@sparkleerp.local   Developer
+priya@sparkleerp.local   Admin
+```
+
+```txt
+POST   /api/auth/register
+POST   /api/auth/login
+GET    /api/auth/me          (requires Bearer token)
+```
+
+New registrations are created as `SupportAgent`. Set `Jwt:Secret` in configuration for production (32+ characters).
+
 ## API Endpoints
 
 ```txt

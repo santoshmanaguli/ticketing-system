@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SparkleTicketing.Api.Data;
 
@@ -11,9 +12,11 @@ using SparkleTicketing.Api.Data;
 namespace SparkleTicketing.Api.Migrations
 {
     [DbContext(typeof(SparkleTicketingDbContext))]
-    partial class SparkleTicketingDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260521055828_AddUserPasswordHash")]
+    partial class AddUserPasswordHash
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

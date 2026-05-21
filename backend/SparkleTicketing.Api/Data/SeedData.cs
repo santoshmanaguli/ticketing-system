@@ -1,16 +1,22 @@
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using SparkleTicketing.Api.Models;
+using SparkleTicketing.Api.Services;
 
 namespace SparkleTicketing.Api.Data;
 
 public static class SeedData
 {
+    public const string DefaultSeedPassword = "Sparkle@123";
+
     public static async Task InitializeAsync(IServiceProvider services)
     {
         using var scope = services.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<SparkleTicketingDbContext>();
+        var passwordHasher = scope.ServiceProvider.GetRequiredService<PasswordHasher<AppUser>>();
 
         await db.Database.MigrateAsync();
+        await EnsurePasswordHashesAsync(db, passwordHasher);
 
         if (!await db.ErpModules.AnyAsync())
         {
@@ -28,10 +34,10 @@ public static class SeedData
         if (!await db.Users.AnyAsync())
         {
             db.Users.AddRange(
-                new AppUser { FullName = "Aarav Mehta", Email = "aarav@sparkleerp.local", Role = UserRole.SupportManager },
-                new AppUser { FullName = "Nisha Shah", Email = "nisha@sparkleerp.local", Role = UserRole.SupportAgent },
-                new AppUser { FullName = "Rohan Iyer", Email = "rohan@sparkleerp.local", Role = UserRole.Developer },
-                new AppUser { FullName = "Priya Nair", Email = "priya@sparkleerp.local", Role = UserRole.Admin });
+                CreateSeedUser("Aarav Mehta", "aarav@sparkleerp.local", UserRole.SupportManager, passwordHasher),
+                CreateSeedUser("Nisha Shah", "nisha@sparkleerp.local", UserRole.SupportAgent, passwordHasher),
+                CreateSeedUser("Rohan Iyer", "rohan@sparkleerp.local", UserRole.Developer, passwordHasher),
+                CreateSeedUser("Priya Nair", "priya@sparkleerp.local", UserRole.Admin, passwordHasher));
         }
 
         if (!await db.Customers.AnyAsync())
@@ -162,5 +168,44 @@ public static class SeedData
 
             await db.SaveChangesAsync();
         }
+    }
+
+    private static AppUser CreateSeedUser(
+        string fullName,
+        string email,
+        UserRole role,
+        PasswordHasher<AppUser> passwordHasher)
+    {
+        var user = new AppUser
+        {
+            FullName = fullName,
+            Email = email,
+            Role = role,
+            IsActive = true
+        };
+
+        user.PasswordHash = AuthService.HashPassword(passwordHasher, user, DefaultSeedPassword);
+        return user;
+    }
+
+    private static async Task EnsurePasswordHashesAsync(
+        SparkleTicketingDbContext db,
+        PasswordHasher<AppUser> passwordHasher)
+    {
+        var usersMissingHash = await db.Users
+            .Where(user => user.PasswordHash == "")
+            .ToListAsync();
+
+        if (usersMissingHash.Count == 0)
+        {
+            return;
+        }
+
+        foreach (var user in usersMissingHash)
+        {
+            user.PasswordHash = AuthService.HashPassword(passwordHasher, user, DefaultSeedPassword);
+        }
+
+        await db.SaveChangesAsync();
     }
 }

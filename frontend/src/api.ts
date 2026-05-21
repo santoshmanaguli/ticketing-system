@@ -9,12 +9,16 @@ import type {
   UpdateTicketStatusRequest
 } from "./apiTypes";
 
+import { getAuthToken } from "./lib/authStorage";
+
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:5001/api";
 
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
+  const token = getAuthToken();
   const response = await fetch(`${API_BASE_URL}${path}`, {
     headers: {
       "Content-Type": "application/json",
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
       ...init?.headers
     },
     ...init
